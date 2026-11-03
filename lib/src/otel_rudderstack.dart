@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_rudderstack_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_rudderstack';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class RudderstackResult {
+  /// Creates a result.
   const RudderstackResult({
     this.workspaceId,
     this.sourceId,
@@ -83,8 +84,13 @@ class RudderstackResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class RudderstackCallResult<T> {
+  /// Creates a call result.
   const RudderstackCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final RudderstackResult? result;
 }
@@ -112,74 +118,74 @@ Future<T> tracedRudderstack<T>({
   final span = _tracer().startSpan(
     'rudderstack $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.workspaceId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.workspace.id',
           r.result!.workspaceId!,
         ));
       }
       if (r.result!.sourceId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.source.id',
           r.result!.sourceId!,
         ));
       }
       if (r.result!.sourceType != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.source.type',
           r.result!.sourceType!,
         ));
       }
       if (r.result!.writeKey != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.source.write_key',
           r.result!.writeKey!,
         ));
       }
       if (r.result!.destinationId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.destination.id',
           r.result!.destinationId!,
         ));
       }
       if (r.result!.destinationType != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.destination.type',
           r.result!.destinationType!,
         ));
       }
       if (r.result!.eventType != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.event.type',
           r.result!.eventType!,
         ));
       }
       if (r.result!.eventName != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.event.name',
           r.result!.eventName!,
         ));
       }
       if (r.result!.deliveryMode != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.delivery.mode',
           r.result!.deliveryMode!,
         ));
       }
       if (r.result!.transformationId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.transformation.id',
           r.result!.transformationId!,
         ));
       }
       if (r.result!.transformationStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.transformation.status',
           r.result!.transformationStatus!,
         ));
@@ -191,25 +197,25 @@ Future<T> tracedRudderstack<T>({
         }
       }
       if (r.result!.batchSize != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'rudderstack.batch.size',
           r.result!.batchSize!,
         ));
       }
       if (r.result!.eventsEvents != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'rudderstack.events.count',
           r.result!.eventsEvents!,
         ));
       }
       if (r.result!.eventsBytes != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'rudderstack.events.bytes',
           r.result!.eventsBytes!,
         ));
       }
       if (r.result!.deliveryStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'rudderstack.delivery.status',
           r.result!.deliveryStatus!,
         ));
@@ -222,7 +228,7 @@ Future<T> tracedRudderstack<T>({
         }
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -233,13 +239,13 @@ Future<T> tracedRudderstack<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
